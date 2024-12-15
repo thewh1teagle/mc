@@ -86,10 +86,11 @@ fn main() -> Result<()> {
     // Set up progress handler
     #[allow(unused)]
     let dir_progress_handler = |info: fs_extra::dir::TransitProcess| {
+        
         tracing::info!(
             "Progress: {}% ({}/{})",
-            info.file_bytes_copied * 100 / info.total_bytes,
-            format_size(info.file_bytes_copied as u64, DECIMAL),
+            info.copied_bytes * 100 / info.total_bytes,
+            format_size(info.copied_bytes as u64, DECIMAL),
             format_size(info.total_bytes as u64, DECIMAL)
         );
         // Exists
@@ -111,6 +112,7 @@ fn main() -> Result<()> {
 
     #[allow(unused)]
     let file_progress_handler = |info: fs_extra::file::TransitProcess| {
+        
         tracing::info!(
             "Progress: {}% ({}/{})",
             info.copied_bytes * 100 / info.total_bytes,
