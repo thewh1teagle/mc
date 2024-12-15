@@ -163,24 +163,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "325918d6fe32f23b19878fe4b34794ae41fc19ddbe53b10571a4874d44ffd39b"
 
 [[package]]
-name = "ccp"
-version = "0.1.0"
-dependencies = [
- "blake2",
- "clap",
- "digest",
- "eyre",
- "file-hashing",
- "fs_extra",
- "hex",
- "humansize",
- "num_cpus",
- "sha256",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -500,6 +482,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8263075bb86c5a1b1427b5ae862e8889656f126e9f77c484496e8b47cf5c5558"
 dependencies = [
  "regex-automata 0.1.10",
+]
+
+[[package]]
+name = "mc"
+version = "0.1.0"
+dependencies = [
+ "blake2",
+ "clap",
+ "digest",
+ "eyre",
+ "file-hashing",
+ "fs_extra",
+ "hex",
+ "humansize",
+ "num_cpus",
+ "sha256",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
