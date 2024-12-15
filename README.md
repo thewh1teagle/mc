@@ -8,8 +8,10 @@ Modern file copying
 - 🔄 Progress bar
 - 🔐 Verify with hash
 - 🔗 Hard link files
-- 🔗🔗 Symbolic link files
+- 🔗 Symbolic link files
+- ⚡ Faster than Finder or Explorer
 - 🛏️ Keep system awake while copying
+
 
 ## Install
 
