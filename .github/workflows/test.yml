@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 on:
   push:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   fmt:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -34,8 +34,24 @@ jobs:
       - name: Run cargo fmt
         run: cargo fmt --manifest-path Cargo.toml --all -- --check
 
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install Rust stable and clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: run test
+        run: cargo test
+
   clippy:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
