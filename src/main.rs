@@ -194,7 +194,8 @@ fn main() -> Result<()> {
     }
 
     pb.finish();
-    println!("{}", style(format!("Copy completed successfully in {:?}.", start_time.elapsed())).bold().green());
+    println!("{}", style(format!("Copy completed successfully in {:.2?}.", start_time.elapsed())).bold().green());
+
     
 
     let hash_progress_cb = |info | {
