@@ -4,6 +4,7 @@ version = "0.4.1"
 edition = "2021"
 repository = "https://github.com/thewh1teagle/mc"
 description = "Cross platform copy files with progress"
+license = "MIT"
 
 [dependencies]
 blake2 = "0.10.6"
