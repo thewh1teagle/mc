@@ -1,0 +1,15 @@
+{
+    "build": {
+        "path_prefix": "mc/"
+    },
+    "styles": {
+        "theme": "axodark",
+        "favicon": "https://www.axo.dev/favicon.ico"
+    },
+    "components": {
+        "changelog": true,
+        "artifacts": {
+            "package_managers": {}
+        }
+    }
+}
