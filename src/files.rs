@@ -15,24 +15,9 @@ pub fn perform_copy_operation(
 ) -> Result<()> {
     // Perform the copy operation
     if source_path.is_dir() {
-        copy_dir(
-            args.force,
-            !args.no_progress,
-            source_path,
-            destination_path,
-            pb,
-        )?;
+        copy_dir(args, source_path, destination_path, pb)?;
     } else {
-        copy_file(
-            args.force,
-            !args.no_progress,
-            args.symlink,
-            args.hard_link,
-            args.reflink,
-            source_path,
-            destination_path,
-            pb,
-        )?;
+        copy_file(args, source_path, destination_path, pb)?;
     }
     if let Some(pb) = pb {
         pb.finish();
@@ -41,8 +26,7 @@ pub fn perform_copy_operation(
 }
 
 pub fn copy_dir<P: AsRef<Path>>(
-    force: bool,
-    progress: bool,
+    args: &Args,
     source_path: P,
     destination_path: P,
     pb: &Option<ProgressBar>,
@@ -56,16 +40,16 @@ pub fn copy_dir<P: AsRef<Path>>(
         };
 
         // Exists
-        if info.state == TransitState::Exists && force {
+        if info.state == TransitState::Exists && args.force {
             return fs_extra::dir::TransitProcessResult::Overwrite;
         }
         // Access denied
-        else if info.state == TransitState::NoAccess && force {
+        else if info.state == TransitState::NoAccess && args.force {
             tracing::warn!("Access denied to file {}. Skipping...", info.file_name);
             return fs_extra::dir::TransitProcessResult::Skip;
         }
         // Normal
-        if force {
+        if args.force {
             fs_extra::dir::TransitProcessResult::Overwrite
         } else {
             fs_extra::dir::TransitProcessResult::ContinueOrAbort
@@ -74,9 +58,9 @@ pub fn copy_dir<P: AsRef<Path>>(
 
     // Set up copy options
     let mut options = CopyOptions::new();
-    options.overwrite = force;
+    options.overwrite = args.force;
     options.copy_inside = true;
-    if progress {
+    if !args.no_progress {
         dir::copy(source_path, destination_path, &options)?;
     } else {
         dir::copy_with_progress(
@@ -90,11 +74,7 @@ pub fn copy_dir<P: AsRef<Path>>(
 }
 
 pub fn copy_file<P: AsRef<Path>>(
-    force: bool,
-    progress: bool,
-    symlink: bool,
-    hard_link: bool,
-    reflink: bool,
+    args: &Args,
     source_path: P,
     destination_path: P,
     pb: &Option<ProgressBar>,
@@ -108,25 +88,25 @@ pub fn copy_file<P: AsRef<Path>>(
         };
     };
 
-    if destination_path.as_ref().exists() && !force {
+    if destination_path.as_ref().exists() && !args.force {
         bail!(
             "Fail already exists at {}",
             destination_path.as_ref().display()
         )
     }
-    if hard_link {
+    if args.hard_link {
         std::fs::hard_link(source_path, destination_path)?;
-    } else if symlink {
+    } else if args.symlink {
         #[cfg(unix)]
         std::os::unix::fs::symlink(source_path, destination_path)?;
         #[cfg(not(unix))]
         panic!("This platform doesn't support symlink");
     } else {
         let mut file_options = fs_extra::file::CopyOptions::new();
-        file_options.overwrite = force;
-        if reflink {
+        file_options.overwrite = args.force;
+        if args.reflink {
             reflink_copy::reflink_or_copy(source_path, destination_path)?;
-        } else if progress {
+        } else if !args.no_progress {
             fs_extra::file::copy_with_progress(
                 source_path,
                 destination_path,
