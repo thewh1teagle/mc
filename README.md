@@ -12,10 +12,9 @@ Modern file copying
 - ⚡ Faster than Finder or Explorer
 - 🛏️ Keep system awake while copying
 
-
 ## Install
 
-See installation options in [Releases](https://github.com/thewh1teagle/mc/releases/latest)
+See installation options in [Mc Website](https://thewh1teagle.github.io/mc/) or in Github [Releases](https://github.com/thewh1teagle/mc/releases/latest)
 
 ## Usage
 
@@ -23,4 +22,3 @@ See installation options in [Releases](https://github.com/thewh1teagle/mc/releas
 dd if=/dev/zero of=dummy bs=2G count=10
 mc dummy copied_dummy --verify
 ```
-
