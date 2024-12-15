@@ -12,7 +12,8 @@
             "package_managers": {
                 "additional": {
                     "binstall": "cargo binstall mc-cli",
-                    "cargo": "cargo install mc-cli"
+                    "cargo": "cargo install mc-cli",
+                    "git": "cargo install --git https://github.com/thewh1teagle/mc"
                 }
             }
         }
