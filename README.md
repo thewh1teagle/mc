@@ -9,6 +9,7 @@ Modern file copying
 - 🔐 Verify with hash
 - 🔗 Hard link files
 - 🔗🔗 Symbolic link files
+- 🛏️ Keep system awake while copying
 
 ## Test
 

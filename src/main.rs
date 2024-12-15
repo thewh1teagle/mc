@@ -3,7 +3,7 @@ use clap::Parser;
 use eyre::{bail, Result};
 use fs_extra::dir::{self, CopyOptions, TransitState};
 use humansize::{format_size, DECIMAL};
-use std::path::Path;
+use std::{path::Path, time::Instant};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 /// Command-line utility for copying files or directories with optional recursion and overwriting.
@@ -26,7 +26,6 @@ struct Args {
 
     /// Symbol link file
     #[arg(long)]
-    #[cfg(unix)]
     symlink: bool,
 
     /// Verify hash of folder / file once copied
@@ -37,9 +36,18 @@ struct Args {
     #[arg(long)]
     no_progress: bool,
 
+    /// Disable keep system awake while copy
+    #[arg(long)]
+    no_keep_awake: bool,
+
+    /// Keep display awake while copy
+    #[arg(long)]
+    keep_display_awake: bool,
 }
 
 fn main() -> Result<()> {
+    let start_time = Instant::now();
+
     // let rust_log = env::var("RUST_LOG").unwrap_or_else(|_| config::DEFAULT_LOG_DIRECTIVE.to_owned());
     let rust_log = std::env::var("RUST_LOG").unwrap_or("INFO".into());
     tracing_subscriber::registry()
@@ -48,6 +56,14 @@ fn main() -> Result<()> {
         .init();
 
     let args = Args::parse();
+
+    if !args.no_keep_awake {
+        // Stopped when program ends
+        keepawake::Builder::default()
+            .app_name(env!("CARGO_PKG_NAME"))
+            .display(args.keep_display_awake)
+            .idle(true);
+    }
 
     let source_path = Path::new(&args.source);
     let destination_path = Path::new(&args.destination);
@@ -110,40 +126,31 @@ fn main() -> Result<()> {
         options.overwrite = args.force;
         options.copy_inside = true;
         if args.no_progress {
-            dir::copy(
-                source_path,
-                destination_path,
-                &options,
-            )?;     
+            dir::copy(source_path, destination_path, &options)?;
         } else {
             dir::copy_with_progress(
                 source_path,
                 destination_path,
                 &options,
                 dir_progress_handler,
-            )?;    
+            )?;
         }
-        
     } else {
         if destination_path.exists() && !args.force {
             bail!("Fail already exists at {}", destination_path.display())
         }
         if args.hard_link {
             std::fs::hard_link(source_path, destination_path)?;
-        }
-
-        #[cfg(unix)]
-        if args.symlink {
+        } else if args.symlink {
+            #[cfg(unix)]
             std::os::unix::fs::symlink(source_path, destination_path)?;
+            #[cfg(not(unix))]
+            panic!("This platform doesn't support symlink");
         } else {
             let mut file_options = fs_extra::file::CopyOptions::new();
             file_options.overwrite = args.force;
             if args.no_progress {
-                fs_extra::file::copy(
-                    source_path,
-                    destination_path,
-                    &file_options,
-                )?;
+                fs_extra::file::copy(source_path, destination_path, &file_options)?;
             } else {
                 fs_extra::file::copy_with_progress(
                     source_path,
@@ -152,11 +159,10 @@ fn main() -> Result<()> {
                     file_progress_handler,
                 )?;
             }
-            
         }
     }
 
-    tracing::info!("Copy completed successfully.");
+    tracing::info!("Copy completed successfully in {:?}.", start_time.elapsed());
 
     if args.verify {
         tracing::info!("Computing hash...");
@@ -182,5 +188,6 @@ fn main() -> Result<()> {
         tracing::info!("Destination hash: {}", dst_hash);
         assert_eq!(source_hash, dst_hash);
     }
+
     Ok(())
 }
