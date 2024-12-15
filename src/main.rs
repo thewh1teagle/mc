@@ -2,9 +2,11 @@ use blake2::{Blake2s256, Digest};
 use clap::Parser;
 use eyre::{bail, Result};
 use fs_extra::dir::{self, CopyOptions, TransitState};
-use humansize::{format_size, DECIMAL};
-use std::{path::Path, time::Instant};
+use tracing_indicatif::IndicatifLayer;
+use std::{fmt::Write, path::Path, time::Instant};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use indicatif::{ProgressBar, ProgressState, ProgressStyle};
+use console::{style, Emoji};
 
 /// Command-line utility for copying files or directories with optional recursion and overwriting.
 #[derive(Parser, Debug)]
@@ -50,12 +52,15 @@ fn main() -> Result<()> {
 
     // let rust_log = env::var("RUST_LOG").unwrap_or_else(|_| config::DEFAULT_LOG_DIRECTIVE.to_owned());
     let rust_log = std::env::var("RUST_LOG").unwrap_or("INFO".into());
+    let indicatif_layer: IndicatifLayer<tracing_subscriber::registry::Registry> = IndicatifLayer::new();
+
     tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().with_writer(indicatif_layer.get_stderr_writer()))
         .with(EnvFilter::new(rust_log))
         .init();
 
     let args = Args::parse();
+    
 
     if !args.no_keep_awake {
         // Stopped when program ends
@@ -83,16 +88,24 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    let pb = ProgressBar::new(0);
+        pb.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")
+        .unwrap()
+        .with_key("eta", |state: &ProgressState, w: &mut dyn Write| write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap())
+        .progress_chars("#>-"));
+
     // Set up progress handler
     #[allow(unused)]
     let dir_progress_handler = |info: fs_extra::dir::TransitProcess| {
-        
-        tracing::info!(
-            "Progress: {}% ({}/{})",
-            info.copied_bytes * 100 / info.total_bytes,
-            format_size(info.copied_bytes as u64, DECIMAL),
-            format_size(info.total_bytes as u64, DECIMAL)
-        );
+        let progress = info.copied_bytes * 100 / info.total_bytes;
+        pb.set_length(info.total_bytes);
+        pb.set_position(info.copied_bytes);
+        // tracing::info!(
+        //     "Progress: {}% ({}/{})",
+        //     progress,
+        //     format_size(info.copied_bytes as u64, DECIMAL),
+        //     format_size(info.total_bytes as u64, DECIMAL)
+        // );
         // Exists
         if info.state == TransitState::Exists && args.force {
             return fs_extra::dir::TransitProcessResult::Overwrite;
@@ -112,16 +125,22 @@ fn main() -> Result<()> {
 
     #[allow(unused)]
     let file_progress_handler = |info: fs_extra::file::TransitProcess| {
-        
-        tracing::info!(
-            "Progress: {}% ({}/{})",
-            info.copied_bytes * 100 / info.total_bytes,
-            format_size(info.copied_bytes as u64, DECIMAL),
-            format_size(info.total_bytes as u64, DECIMAL)
-        );
+        let progress = info.copied_bytes * 100 / info.total_bytes;
+        pb.set_length(info.total_bytes);
+        pb.set_position(info.copied_bytes);
+        // tracing::info!(
+        //     "Progress: {}% ({}/{})",
+        //     progress,
+        //     format_size(info.copied_bytes as u64, DECIMAL),
+        //     format_size(info.total_bytes as u64, DECIMAL)
+        // );
     };
 
     // Perform the copy operation
+    println!(
+        "{}",
+        style(format!("Copy {} to {}...", source_path.display(), destination_path.display())).bold().dim(),
+    );
     if source_path.is_dir() {
         // Set up copy options
         let mut options = CopyOptions::new();
@@ -164,7 +183,9 @@ fn main() -> Result<()> {
         }
     }
 
-    tracing::info!("Copy completed successfully in {:?}.", start_time.elapsed());
+    pb.finish();
+    println!("{}", style(format!("Copy completed successfully in {:?}.", start_time.elapsed())).bold().green());
+    
 
     let hash_progress_cb = |info | {
         match info {
@@ -201,6 +222,7 @@ fn main() -> Result<()> {
         tracing::info!("Destination hash: {}", dst_hash);
         assert_eq!(source_hash, dst_hash);
     }
+    
 
     Ok(())
 }
