@@ -11,7 +11,7 @@ Modern file copying
 - 🔗 Symbolic link files
 - ⚡ Faster than Finder or Explorer
 - 🛏️ Keep system awake while copying
-- 🔄 Auto update with `mc-update` command
+- 🔄 Auto update with `mc-cli-update` command
 
 ## Install
 
