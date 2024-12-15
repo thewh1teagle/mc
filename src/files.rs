@@ -99,8 +99,8 @@ pub fn copy_file<P: AsRef<Path>>(
     } else if args.symlink {
         #[cfg(unix)]
         std::os::unix::fs::symlink(source_path, destination_path)?;
-        #[cfg(not(unix))]
-        panic!("This platform doesn't support symlink");
+        #[cfg(windows)]
+        std::os::windows::fs::symlink(source_path, destination_path)?;
     } else {
         let mut file_options = fs_extra::file::CopyOptions::new();
         file_options.overwrite = args.force;
