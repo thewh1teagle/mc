@@ -15,7 +15,7 @@ Modern file copying
 
 See installation options in [Mc Website](https://thewh1teagle.github.io/mc)
 
-## Test
+## Usage
 
 ```console
 dd if=/dev/zero of=dummy bs=2G count=10
