@@ -13,6 +13,7 @@ Modern file copying
 - ⚡ Faster than Finder or Explorer
 - 🛏️ Keep system awake while copying
 - 🔄 Auto update with command (`mc-cli-update`)
+- 💻 Cross platform: Windows / macOS / Linux
 
 ## Install
 
