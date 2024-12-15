@@ -23,8 +23,11 @@ tracing = "0.1.41"
 tracing-indicatif = "0.3.8"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
+[dev-dependencies]
+rand = "0.8.5"
+tempfile = "3.14.0"
+
 # The profile that 'dist' will build with
 [profile.dist]
 inherits = "release"
 lto = "thin"
-
