@@ -9,9 +9,10 @@ Modern file copying
 - 🔐 Verify with hash
 - 🔗 Hard link files
 - 🔗 Symbolic link files
-- ⚡ Faster than Finder or Explorer (with `--no-progress`)
+- 🔗 Reflink link files
+- ⚡ Faster than Finder or Explorer
 - 🛏️ Keep system awake while copying
-- 🔄 Auto update with `mc-cli-update` command
+- 🔄 Auto update with command (`mc-cli-update`)
 
 ## Install
 
