@@ -11,6 +11,10 @@ Modern file copying
 - 🔗🔗 Symbolic link files
 - 🛏️ Keep system awake while copying
 
+## Install
+
+See installation options in [Mc Website](https://thewh1teagle.github.io/mc)
+
 ## Test
 
 ```console
