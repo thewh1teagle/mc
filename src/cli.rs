@@ -24,6 +24,11 @@ pub struct Args {
     #[arg(long)]
     pub symlink: bool,
 
+    /// Ref link file
+    /// Similar to hardlink except modify one doesn't affect the other
+    #[arg(long)]
+    pub reflink: bool,
+
     /// Verify hash of folder / file once copied
     #[arg(long)]
     pub verify: bool,

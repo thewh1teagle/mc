@@ -28,6 +28,7 @@ pub fn perform_copy_operation(
             !args.no_progress,
             args.symlink,
             args.hard_link,
+            args.reflink,
             source_path,
             destination_path,
             pb,
@@ -93,6 +94,7 @@ pub fn copy_file<P: AsRef<Path>>(
     progress: bool,
     symlink: bool,
     hard_link: bool,
+    reflink: bool,
     source_path: P,
     destination_path: P,
     pb: &Option<ProgressBar>,
@@ -122,7 +124,9 @@ pub fn copy_file<P: AsRef<Path>>(
     } else {
         let mut file_options = fs_extra::file::CopyOptions::new();
         file_options.overwrite = force;
-        if progress {
+        if reflink {
+            reflink_copy::reflink_or_copy(source_path, destination_path)?;
+        } else if progress {
             fs_extra::file::copy_with_progress(
                 source_path,
                 destination_path,
@@ -170,6 +174,7 @@ mod tests {
             no_keep_awake: true,
             source: vec![source_file.to_str().unwrap().to_string()],
             verify: false,
+            reflink: false,
         };
 
         // Perform the copy operation
@@ -209,6 +214,7 @@ mod tests {
             no_keep_awake: true,
             source: vec![source_dir.to_str().unwrap().to_string()],
             verify: false,
+            reflink: false,
         };
 
         // Perform the copy operation

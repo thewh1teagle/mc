@@ -63,6 +63,7 @@ mod tests {
             hard_link: false,
             keep_display_awake: false,
             no_keep_awake: true,
+            reflink: false,
         };
 
         let result = ensure_valid_paths(&args);
@@ -82,6 +83,7 @@ mod tests {
             hard_link: false,
             keep_display_awake: false,
             no_keep_awake: true,
+            reflink: false,
         };
 
         let result = ensure_valid_paths(&args);
@@ -118,6 +120,7 @@ mod tests {
             hard_link: false,
             keep_display_awake: false,
             no_keep_awake: true,
+            reflink: false,
         };
 
         // Ensure that the destination directory doesn't exist before the test

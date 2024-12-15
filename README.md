@@ -19,7 +19,31 @@ See installation options in [Mc Website](https://thewh1teagle.github.io/mc/) or 
 
 ## Usage
 
+See `--help`
+
+<details>
+
+<summary>Details</summary>
+
 ```console
-dd if=/dev/zero of=dummy bs=2G count=10
-mc dummy copied_dummy --verify
+Copies files or directories with options for recursion and overwriting.
+
+Usage: mc [OPTIONS] <SOURCE>... <DESTINATION>
+
+Arguments:
+  <SOURCE>...    Source file or directory to copy
+  <DESTINATION>  Destination file or directory
+
+Options:
+  -f, --force               Overwrite destination if it exists
+      --hard-link           Hard link file
+      --symlink             Symbol link file
+      --reflink             Ref link file Similar to hardlink except modify one doesn't affect the other
+      --verify              Verify hash of folder / file once copied
+      --no-progress         Disable progress bar
+      --no-keep-awake       Disable keep system awake while copy
+      --keep-display-awake  Keep display awake while copy
+  -h, --help                Print help
 ```
+
+</details>
