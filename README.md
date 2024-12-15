@@ -13,7 +13,7 @@ Modern file copying
 
 ## Install
 
-See installation options in [Mc Website](https://thewh1teagle.github.io/mc)
+See installation options in [Mc Website](https://thewh1teagle.github.io/mc) or [Releases](https://github.com/thewh1teagle/mc/releases/latest)
 
 ## Usage
 
