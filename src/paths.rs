@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::args::Args;
+use crate::cli::Args;
 
 pub fn ensure_valid_paths(args: &Args) -> Result<PathBuf> {
     for source in &args.source {

@@ -2,12 +2,12 @@ use clap::Parser;
 use console::style;
 use eyre::Result;
 use std::{path::Path, time::Instant};
-mod args;
-use args::Args;
-mod file_ops;
-mod hash_ops;
+mod cli;
+use cli::Args;
+mod files;
+mod hash;
 mod log;
-mod path_ops;
+mod paths;
 mod progress;
 
 fn main() -> Result<()> {
@@ -24,7 +24,7 @@ fn main() -> Result<()> {
             .idle(true);
     }
 
-    let destination_path = path_ops::ensure_valid_paths(&args)?;
+    let destination_path = paths::ensure_valid_paths(&args)?;
 
     for source in &args.source {
         let source_path = Path::new(&source);
@@ -50,7 +50,7 @@ fn main() -> Result<()> {
             .bold()
             .dim(),
         );
-        file_ops::perform_copy_operation(&args, source_path, destination_path, &pb).unwrap();
+        files::perform_copy_operation(&args, source_path, destination_path, &pb).unwrap();
 
         println!(
             "{}",
@@ -64,7 +64,7 @@ fn main() -> Result<()> {
 
         if args.verify {
             tracing::info!("Computing hash...");
-            hash_ops::verify_hash(source_path, destination_path)?;
+            hash::verify_hash(source_path, destination_path)?;
         }
     }
     Ok(())

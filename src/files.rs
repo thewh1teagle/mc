@@ -5,7 +5,7 @@ use fs_extra::dir::CopyOptions;
 use fs_extra::dir::{self, TransitState};
 use indicatif::ProgressBar;
 
-use crate::args::Args;
+use crate::cli::Args;
 
 pub fn perform_copy_operation(
     args: &Args,
