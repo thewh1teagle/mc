@@ -1223,7 +1223,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mc"
+name = "mc-cli"
 version = "0.4.1"
 dependencies = [
  "blake2",
