@@ -1,6 +1,6 @@
 use clap::Parser;
 use console::style;
-use eyre::Result;
+use eyre::{ContextCompat, Result};
 use std::{path::Path, time::Instant};
 mod cli;
 use cli::Args;
@@ -32,12 +32,13 @@ fn main() -> Result<()> {
         let mut current_destination = destination_path.clone();
 
         if source_path.is_file() && destination_path.is_dir() {
-            current_destination = current_destination.join(source_path.file_name().unwrap());
+            current_destination =
+                current_destination.join(source_path.file_name().context("filename")?);
         }
         let destination_path = current_destination.as_path();
         tracing::debug!("destination: {}", destination_path.display());
 
-        let pb = progress::create_progress_bar();
+        let pb = progress::create_progress_bar()?;
 
         // Perform the copy operation
         println!(
@@ -50,7 +51,7 @@ fn main() -> Result<()> {
             .bold()
             .dim(),
         );
-        files::perform_copy_operation(&args, source_path, destination_path, &pb).unwrap();
+        files::perform_copy_operation(&args, source_path, destination_path, &pb)?;
 
         println!(
             "{}",

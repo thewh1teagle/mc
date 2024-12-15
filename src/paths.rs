@@ -15,24 +15,24 @@ pub fn ensure_valid_paths(args: &Args) -> Result<PathBuf> {
 
     if args.source.len() > 1 && !Path::new(&args.destination).exists() {
         if args.force {
-            fs::create_dir_all(&args.destination).unwrap();
+            fs::create_dir_all(&args.destination)?;
         } else {
             bail!("No such directory {}.", args.destination);
         }
     }
 
     let destination_path = if Path::new(&args.destination).exists() {
-        PathBuf::from(&args.destination).canonicalize().unwrap()
+        PathBuf::from(&args.destination).canonicalize()?
     } else {
         if args.destination.ends_with('/') && args.force {
-            fs::create_dir_all(&args.destination).unwrap();
+            fs::create_dir_all(&args.destination)?;
         }
         PathBuf::from(&args.destination)
     };
 
     if let Some(parent) = Path::new(&args.destination).parent() {
         if args.force && !parent.exists() {
-            fs::create_dir_all(parent).unwrap();
+            fs::create_dir_all(parent)?;
         }
     }
 
