@@ -164,6 +164,17 @@ fn main() -> Result<()> {
 
     tracing::info!("Copy completed successfully in {:?}.", start_time.elapsed());
 
+    let hash_progress_cb = |info | {
+        match info {
+            file_hashing::ProgressInfo::Yield(p) => {
+                tracing::info!("Hashing... ({}%)", p);
+            },
+            file_hashing::ProgressInfo::Error(error) => {
+                panic!("Failed to hash file: {:?}", error)
+            }
+        }
+    };
+
     if args.verify {
         tracing::info!("Computing hash...");
         let mut source_hash = Blake2s256::new();
@@ -174,7 +185,7 @@ fn main() -> Result<()> {
                 destination_path,
                 &mut dst_hash,
                 num_cpus::get(),
-                |_| {},
+             hash_progress_cb
             )?;
         } else {
             file_hashing::get_hash_file(source_path, &mut source_hash)?;
