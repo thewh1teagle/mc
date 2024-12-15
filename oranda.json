@@ -9,10 +9,11 @@
     "components": {
         "changelog": true,
         "artifacts": {
-            "package_managers": {},
-            "additional": {
-                "binstall": "cargo binstall mc-cli",
-                "cargo": "cargo install mc-cli"
+            "package_managers": {
+                "additional": {
+                    "binstall": "cargo binstall mc-cli",
+                    "cargo": "cargo install mc-cli"
+                }
             }
         }
     }
