@@ -32,6 +32,11 @@ struct Args {
     /// Verify hash of folder / file once copied
     #[arg(long)]
     verify: bool,
+
+    /// Disable progress bar
+    #[arg(long)]
+    no_progress: bool,
+
 }
 
 fn main() -> Result<()> {
@@ -63,6 +68,7 @@ fn main() -> Result<()> {
     }
 
     // Set up progress handler
+    #[allow(unused)]
     let dir_progress_handler = |info: fs_extra::dir::TransitProcess| {
         tracing::info!(
             "Progress: {}% ({}/{})",
@@ -87,6 +93,7 @@ fn main() -> Result<()> {
         }
     };
 
+    #[allow(unused)]
     let file_progress_handler = |info: fs_extra::file::TransitProcess| {
         tracing::info!(
             "Progress: {}% ({}/{})",
@@ -102,12 +109,21 @@ fn main() -> Result<()> {
         let mut options = CopyOptions::new();
         options.overwrite = args.force;
         options.copy_inside = true;
-        dir::copy_with_progress(
-            source_path,
-            destination_path,
-            &options,
-            dir_progress_handler,
-        )?;
+        if args.no_progress {
+            dir::copy(
+                source_path,
+                destination_path,
+                &options,
+            )?;     
+        } else {
+            dir::copy_with_progress(
+                source_path,
+                destination_path,
+                &options,
+                dir_progress_handler,
+            )?;    
+        }
+        
     } else {
         if destination_path.exists() && !args.force {
             bail!("Fail already exists at {}", destination_path.display())
@@ -122,12 +138,21 @@ fn main() -> Result<()> {
         } else {
             let mut file_options = fs_extra::file::CopyOptions::new();
             file_options.overwrite = args.force;
-            fs_extra::file::copy_with_progress(
-                source_path,
-                destination_path,
-                &file_options,
-                file_progress_handler,
-            )?;
+            if args.no_progress {
+                fs_extra::file::copy(
+                    source_path,
+                    destination_path,
+                    &file_options,
+                )?;
+            } else {
+                fs_extra::file::copy_with_progress(
+                    source_path,
+                    destination_path,
+                    &file_options,
+                    file_progress_handler,
+                )?;
+            }
+            
         }
     }
 
