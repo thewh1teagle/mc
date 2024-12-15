@@ -6,7 +6,7 @@ use tracing_indicatif::IndicatifLayer;
 use std::{fmt::Write, path::Path, time::Instant};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
-use console::{style, Emoji};
+use console::style;
 
 /// Command-line utility for copying files or directories with optional recursion and overwriting.
 #[derive(Parser, Debug)]
@@ -71,7 +71,17 @@ fn main() -> Result<()> {
     }
 
     let source_path = Path::new(&args.source);
-    let destination_path = Path::new(&args.destination);
+    let mut destination_path = if args.destination == "." {
+        std::fs::canonicalize(".")?
+    } else {
+        Path::new(&args.destination).to_path_buf()
+    };
+
+    if source_path.is_file() && destination_path.is_dir() {
+        destination_path = destination_path.join(source_path.file_name().unwrap());
+    }
+    let destination_path = destination_path.as_path();
+    tracing::debug!("destination: {}", destination_path.display());
 
     // Check if source exists
     if !source_path.exists() {
