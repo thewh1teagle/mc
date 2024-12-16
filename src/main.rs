@@ -14,6 +14,24 @@ fn main() -> Result<()> {
     let start_time = Instant::now();
     log::init_logger();
 
+    // Version
+    let args: Vec<String> = std::env::args().collect();
+    if args.contains(&"-v".to_string()) || args.contains(&"--version".to_string()) {
+        let commit_hash = env!("COMMIT_HASH");
+
+        println!(
+            "{} {}{}",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION"),
+            if commit_hash.is_empty() {
+                "".to_string()
+            } else {
+                format!(" ({})", commit_hash).to_string()
+            }
+        );
+        return Ok(());
+    }
+
     let args = Args::parse();
 
     if !args.no_keep_awake {
